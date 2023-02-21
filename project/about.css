@@ -1,0 +1,115 @@
+body{
+  background: black !important;
+}
+
+#logo{
+  font-family: 'Calligraffitti', cursive;
+  transition: font-size 300ms;
+}
+
+
+.navbar {
+    transition: all 0.4s;
+}
+
+.navbar .nav-link {
+    color: #fff;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    color: #fff;
+    text-decoration: none;
+}
+
+.navbar .navbar-brand {
+    color: #fff;
+}
+
+a#logo:hover {
+    font-size: 25px;
+}
+
+.text{
+  color: white;
+}
+
+a.text:hover {
+    text-decoration: none;
+    color: #9d9d9d;
+}
+
+a.text-fo1:hover {
+    text-decoration: none;
+    color: #9d9d9d;
+}
+
+ul.nav-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+li.text-fo {
+    max-width: 150px;
+    margin-right: 30px;
+    margin-bottom: 0;
+    text-align: center;
+    list-style: none;
+}
+
+.pre p {
+    font-weight: lighter;
+}
+
+
+.row img {
+    width: 100%;
+}
+.col-md-6 p {
+    font-size: 30px;
+}
+
+.info img {
+    border-radius: 30px 30px;
+}
+iframe{
+  border: none;
+}
+.intro {
+    position: relative;
+    color: white;
+    filter: blur();
+}
+
+.about {
+    position: absolute;
+    bottom: 15px;
+    margin: auto;
+}
+.about p {
+    column-count: 2;
+}
+
+.intro {
+    filter: grayscale(1);
+}
+
+.row {
+    margin: 100px 0;
+}
+
+.pre.row.text-white {
+    margin: 15px 0;
+}
+
+.pre a i {
+    font-size: 45px;
+}
+
+#row1, #row2, #row3, #row4 {
+  opacity: 0;
+  transition: opacity 400ms;
+}

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<script type="text/javascript" src="jquery-1.11.min.js"></script>
+    <script type="text/javascript" src="bootstrap.min.js"></script>
+	<script type="text/javascript" src="etao.js"></script>
+	<script type="text/javascript" src="cart.js"></script>
+	<link href="etao.css" media="screen" rel="stylesheet" type="text/css" />
+	<link href="cart.css" media="screen" rel="stylesheet" type="text/css" />
+	<link href="bootstrap.min.css" media="screen" rel="stylesheet" type="text/css" />
+<title>Luxury World </title>
+</head>
+<body class="container">
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#new_address_dialog").on("show.bs.modal", function (e) {
+            loadPage("new_address_content_div", "<?php echo $this->baseUrl . '/system/address/add.ajax/cid/' . $this->customerId . '/from/' . base64_encode($_SERVER['REQUEST_URI']); ?>");
+        });
+
+        $("#new_address_dialog").on("hidden.bs.modal", function (e) {
+            $(this).removeData("bs.modal");
+        });
+
+        $("#new_address_button").click(function() {
+            $.ajax({
+                url: "<?php echo $this->baseUrl . '/system/address/save.ajax' ?>",
+                type: 'POST',
+                data: {"customer":$('#customer').val(),"address":$('#address').val(),"zip_code":$('#zip_code').val(),"telephone":$('#telephone').val(),"cell_phone":$('#cell_phone').val(),"contact_person":$('#contact_person').val(),"province_name":$('#province_name').val(),"city_name":$('#city_name').val(),"area_name":$('#area_name').val(),"is_default":0},
+                error: function() { alert("Đã phát hiện ra lỗi!!"); },
+                success: function(msg) {
+                    //alert(msg);
+                    $(".address-list li").removeClass("selected");
+                    $(".address-list").append("<li class='selected'><input type='radio' id='addr_0' name='ship_to1' value='' checked /><label for='addr_0'>" + msg + "</label>");
+                    $('#ship_to').val(msg);
+                    $("#new_address_dialog").modal("hide");
+                }
+            });
+        });
+
+        $(".address-list li :radio").click(function() {
+            $(this).parent().parent().addClass("selected").siblings().removeClass("selected");
+        });
+
+        $("#rebate").blur(function() { //Đảm bảo rằng số giảm giá là hợp lệ
+            item_qty = parseInt($(this).val());
+            if (isNaN(item_qty) || (item_qty == 0)) {
+                $(this).val($("#max_rebate").val());
+            }
+        });
+
+        $("#credit").blur(function() { //Đảm bảo rằng số lượng hạn mức tín dụng hợp lệ
+            item_qty = parseInt($(this).val());
+            if (isNaN(item_qty) || (item_qty == 0)) {
+                $(this).val(0);
+            }
+        });
+
+        $("#new_iris_project_dialog").on("show.bs.modal", function (e) {
+            loadPage("new_iris_project_content_div", "<?php echo $this->baseUrl . '/trans/iris/add.ajax/'; ?>");
+        });
+
+        $("#new_iris_project_dialog").on("hidden.bs.modal", function (e) {
+            $(this).removeData("bs.modal");
+        });
+
+        $("#new_iris_project_button").click(function() {
+            $.ajax({
+                url: "<?php echo $this->baseUrl . '/trans/iris/save.ajax' ?>",
+                type: 'POST',
+                data: {"db_action":$('#db_action').val(),"customer_id":$('#customer_id').val(),"project_name":$('#project_name').val(),"project_site":$('#project_site').val(),"project_cycle":$('#project_cycle').val(),"project_vendor":$('#project_vendor').val(),"freezing_medium":$('#freezing_medium').val(),"is_valid":$('#is_valid').val()},
+                error: function() { alert("Đã phát hiện ra lỗi!!"); },
+                success: function(msg) {
+                    $("#new_iris_project_dialog").modal("hide");
+                    location.reload();
+                }
+            });
+        });
+    });
+
+    function saveAddress() {
+        $.ajax({
+            type: "post",
+            url: "<?php echo $this->baseUrl . '/system/address/save.ajax';?>",
+            data: {"customer":$('#customer').val(),"address":$('#address').val(),"zip_code":$('#zip_code').val(),"telephone":$('#telephone').val(),"cell_phone":$('#cell_phone').val(),"contact_person":$('#contact_person').val(),"province_name":$('#province_name').val(),"city_name":$('#city_name').val(),"area_name":$('#area_name').val(),"is_default":0},
+            error: function(msg) {alert("Error:" + msg);},
+            success: function(msg) {
+                $(".address-list li").removeClass("selected");
+                $(".address-list").append("<li class='selected'><input type='radio' id='addr_0' name='ship_to1' value='' checked /><label for='addr_0'>" + msg + "</label>");
+                $('#ship_to').val(msg);
+                closeDiv('new_address_div');
+            }
+        });
+    }
+
+    //Kiểm tra dữ liệu
+    function beforePost() {
+        if (isValid() == false) return false;
+        if (($("#BTB2").prop("checked") == true) && (jQuery.trim($('#BTB_desc').val()) == "")) {
+            alert("Vui lòng cho biết tên của người dùng cuối và điểm đến cuối cùng！");
+            return false;
+        }
+        if ($("#use_rebate").prop("checked") == true) {
+            if (parseInt($("#rebate").val()) > parseInt($("#max_rebate").val())) {
+                //alert($("#rebate").val());
+                //alert($("#max_rebate").val());
+                alert("Số tiền sử dụng giảm giá vượt quá mức tối đa");
+                $("#rebate").focus();
+                return false;
+            }
+        }
+        if ($("#terms").prop("checked") == false) {
+            alert("Trước khi gửi đơn đặt hàng, vui lòng đọc "Điều khoản và Điều kiện Bán hàng của chúng tôi"");
+            return false;
+        }
+        return true;
+    }
+</script>
+
+
+	<div class="row">
+		<div class="col-lg-2 col-md-2 col-sm-2 col-xs-3 hidden-print">
+		Trang Thanh Toán
+		</div>
+
+		<div class="col-lg-10 col-md-10 col-sm-10 col-xs-9" id="workspace" role="main">
+
+			<div class="row hidden-print">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<ol class="breadcrumb">
+						<li><a href="<%=application.getContextPath()%>">Trang Chủ</a></li>
+                        <li class="active">Trang Thanh Toán Đơn Hàng</li>
+					</ol>
+				</div>
+			</div>
+
+			<form style="margin-bottom:40px;" class="form-horizontal" id="order_confirm_form"
+				name="order_confirm_form" method="POST"
+				action="<%=application.getContextPath()%>/order/save">
+				<input type="hidden" id="db_action" name="db_action" value="insert" />
+				<input type="hidden" id="freight_fee" name="freight_fee" value="0" />
+
+				<!-- Thông tin đặt hàng -->
+				<div class="row">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="well well-sm">
+
+						<fieldset>
+							<legend>Thông Tin Đặt Hàng</legend>
+							<div class="form-group">
+								<label
+									class="col-lg-2 col-md-2 col-sm-2 col-xs-12 control-label"
+									for="customer_PO_num">Họ Và Tên</label>
+								<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+									<input class="form-control input-sm" id="customer_PO_num"
+										name="customer_PO_num" required requireText="Vui lòng nhập vão Mã Đơn Hàng:"
+										type="text" maxLength="50" autofocus />
+									<p class="help-block">
+										Vui lòng đảm bảo điền đúng chính xác người nhận nhé! <abbr title="Mã Đơn Hàng là đoạn mã để đánh dấu các đơn hàng, phân biệt chúng với nhau.">Kèm Theo Mã Đơn Hàng nhé!</abbr>
+									</p>
+								</div>
+							</div>
+							<div class="form-group">
+								<label
+									class="col-lg-2 col-md-2 col-sm-2 col-xs-12 control-label">Địa Chỉ Và Thời Gian Nhận Hàng</label>
+								<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+									<input id="rtd" name="rtd" class="form-control input-sm Wdate"
+										type="text" required requireText="Vui lòng chọn ngày giao hàng cần thiết" maxLength="10"
+										onfocus="WdatePicker({lang:'en',isShowWeek:true,isShowClear:false, dateFmt:'yyyy-MM-dd', minDate:'%y-%M-%d'})" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label
+									class="col-lg-2 col-md-2 col-sm-2 col-xs-12 control-label"
+									for="deliver_type">Tỉnh, Thành Phố</label>
+								<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+									<select class="form-control input-sm" id="deliver_type"
+										name="deliver_type" required requireText="Vui lòng chọn Tỉnh và Thành Phố">
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label
+									class="col-lg-2 col-md-2 col-sm-2 col-xs-12 control-label"
+									for="payment_term">Phương Thức Thanh Toán</label>
+								<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+									<select class="form-control input-sm" id="payment_term"
+										name="payment_term" required requireText="Vui lòng chọn phương thức thanh toán">
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label
+									class="col-lg-2 col-md-2 col-sm-2 col-xs-12 control-label"
+									for="shipping_term">Phương Thức Vận Chuyển</label>
+								<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+									<select class="form-control input-sm" id="shipping_term"
+										name="shipping_term" required requireText="Vui lòng chọn phương thức vận chuyển">
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label
+									class="col-lg-2 col-md-2 col-sm-2 col-xs-12 control-label">Địa chỉ hoá đơn</label>
+								<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+									<input class="form-control input-sm" id="bill_to"
+										name="bill_to" type="text" required readonly
+										requireText="Vui lòng nhập địa chỉ hóa đơn" maxLength="200" value="" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label
+									class="col-lg-2 col-md-2 col-sm-2 col-xs-12 control-label"
+									for="mail_address">Địa chỉ thư điện tử</label>
+								<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+									<input class="form-control input-sm" id="mail_address"
+										name="mail_address" required requireText="Vui lòng nhập địa chỉ email"
+										type="email" maxLength="80" value="" />
+									<p class="help-block">Khi đơn hàng của bạn thay đổi, Hệ thống sẽ gửi email đến hộp thư này ngay lập tức</p>
+								</div>
+							</div>
+							<div class="form-group">
+								<label
+									class="col-lg-2 col-md-2 col-sm-2 col-xs-12 control-label">Ghi chú đơn hàng</label>
+								<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+									<textarea class="form-control input-sm" id="remark"
+										name="remark" rows="5" maxLength="150"></textarea>
+									<p class="help-block">Vui lòng ghi chú dưới 150 ký tự.</p>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+									<label class="control-label">Chúng tôi xin phép hỏi một số khảo sát để cải thiện chất lượng Website nhé! Với giao diện mới của chúng tôi có thực sự giúp bạn dễ dàng hiểu được thông tin và đặt hàng không ạ?<sup>1</sup></label>
+									<blockquote>
+										<div class="radio">
+											<label> <input type="radio" id="BTB1" name="BTB"
+												checked value="0" /> Có, Với giao diện mới này rất giúp ích đến chúng tôi trong việc hiểu hơn thông tin sản phẩm cũng như phương thức đặt hàng.
+											</label>
+										</div>
+										<div class="radio">
+											<label> <input type="radio" id="BTB2" name="BTB"
+												value="1" />Không, Nó khá rắc rối đến tôi. Tôi không thể hiểu hết các thông tin sản phâm.
+											</label>
+										</div>
+										<textarea id="BTB_desc" name="BTB_desc" rows="5"
+											class="form-control input-sm" maxLength="100"></textarea>
+										<p class="help-block">Nếu bạn có các vấn đề chưa thể giải quyết, có thể đưa ra câu hỏi, góp ý đến chúng tôi nhé!</p>
+									</blockquote>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+									<label class="control-label">Ở trang Web chúng tôi, hiện tại đang có 5 hãng cùng 5 giao diện khác nhau thể hiên cho mỗi tính cách của các sản phẩm. Liệu với giao diện nào làm bạn để mắt tới nhiều nhất?<sup>2</sup></label>
+									<blockquote>
+										<label class="radio-inline"><input type="radio"
+											id="for_use1" name="for_use" value="N/A" checked />Hublot</label> <label
+											class="radio-inline"><input type="radio"
+											id="for_use2" name="for_use" value="atomic power" />Blancpain</label> <label
+											class="radio-inline"><input type="radio"
+											id="for_use3" name="for_use" value="biological" />Omega</label> <label
+											class="radio-inline"><input type="radio"
+											id="for_use4" name="for_use" value="chemistry" />Rolex</label> <label
+											class="radio-inline"><input type="radio"
+											id="for_use5" name="for_use"
+											value="missile research and development" />Các giao diện của mỗi hàng đều đặc biệt. </label> <label
+											class="radio-inline"><input type="radio"
+											id="for_use6" name="for_use" value="military" />Muốn thêm nữa các hãng đồng hồ nổi tiếng khác.</label>
+									</blockquote>
+								</div>
+							</div>
+							<div class="alert alert-warning">
+								Chúng tôi mong rằng các bạn có thể tick chọn vào các đáp án trên, để chúng tôi có thể dựa vào các thông tin trên và thay đổi cũng như cải tiếng trang web của chúng tôi nhiều hơn nữa. Chúng tôi cảm ơn bạn!
+							</div>
+						</fieldset>
+						</div>
+					</div>
+				</div>
+
+				<!-- Địa chỉ giao hàng -->
+				<div class="row">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="well well-sm">
+						<fieldset>
+							<legend>
+								Địa chỉ giao hàng
+								<div class="btn-toolbar pull-right hidden-print" role="tolbar">
+									<div class="btn-group btn-group-sm">
+										<button type="button" class="btn btn-default"
+											title="Thêm và sử dụng một địa chỉ giao hàng mới" data-toggle="modal"
+											data-target="#new_address_dialog">Sử dụng địa chỉ mới</button>
+									</div>
+								</div>
+							</legend>
+							<div class="form-group">
+								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+									<div class="address">
+										<ul class="address-list data-list">
+											<li><label><input type="radio" name="ship_to1"
+													onclick="$('#ship_to').val($(this).parent().text());" />Sử đụng địa chỉ đã được lưu ở các lần giao dịch trước.</label>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</fieldset>
+						</div>
+					</div>
+				</div>
+
+				<!-- Chi tiết mua hàng -->
+				<div class="row">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+					<div class="well well-sm table-responsive">
+						<fieldset>
+							<legend>
+							Chi tiết mua hàng
+								<div class="btn-toolbar pull-right hidden-print" role="tolbar">
+									<div class="btn-group btn-group-sm">
+										<a class="btn btn-default" role="button" href="<%=application.getContextPath()%>/cart/check/1">Quay lại giỏ hàng và sửa đổi sản phẩm</a>
+									</div>
+								</div>
+							</legend>
+							<table class="table table-condensed table-hover">
+								<thead>
+								<tr>
+									<th>Số sản phẩm</th>
+									<th>Mô tả Sản phẩm</th>
+									<th>Nhà máy sản xuất</th>
+									<th>Mã Giảm Giá</th>
+									<th>Định Lượng</th>
+									<th>Đơn Giá</th>
+									<th>Tổng Tiền</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan="7" class="text-right">
+											<p class="form-control-static">
+												Tổng tiển:<span class="large-bold-red">$</span>
+											</p>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</fieldset>
+					</div>
+					</div>
+				</div>
+
+				<!-- Giảm giá khách hàng -->
+				<div class="row ">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class=" well well-sm table-responsive">
+						<fieldset>
+							<legend>Giảm giá của tôi</legend>
+							<table class="table table-condensed table-hover">
+								<thead>
+								<tr>
+									<th>Mã Khách Hàng</th>
+									<th>Tên Khách Hàng</th>
+									<th>Năm Tài Chính</th>
+									<th>Số Tiền Hoàn Lại</th>
+									<th>Số Tiền Đã Sử Dụng</th>
+									<th>Tổng Số Tiền Được Giảm Giá</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td colspan="6"><span class="empty-content">Không có dữ liệu giảm giá cho bạn trong hệ thống.</span></td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan="6">
+											<div class="text-right">
+										Lưu ý: Bạn có thể thanh toán kèm theo mã giãm giá nếu đủ điều kiện tùy thuộc số  <span class="smaller-bold-red">%</span> có trên mã giảm giá.
+												Lần này bạn có thể trả tiền $:<input type="number" min="0" max="100"
+													class="small-bold-red number" id="rebate" name="rebate"
+													value="$rebate" style="width: 100px; margin: 0 3px;" /> Sử Dụng Dollar Thanh Toán
+												<input id="use_rebate" name="use_rebate" value="1"
+													type="checkbox">
+											</div>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</fieldset>
+					</div>
+					</div>
+				</div>
+
+				<!-- Hạn ngạch thông tin -->
+				<div class="row">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="well well-sm table-responsive">
+						<fieldset>
+							<legend>Hạn mức tín dụng của tôi</legend>
+							<table class="table table-condensed table-hover">
+								<thead>
+								<tr>
+									<th>Ngày Bắt Đầu</th>
+									<th>Ngày Kết Thúc</th>
+									<th>Mã Tín dụng</th>
+									<th>Hóa đơn trước</th>
+									<th>Trả nợ kỳ trước</th>
+									<th>Hóa đơn hiện tại</th>
+									<th>Trả nợ trong kỳ này</th>
+									<th>Số lượng sản phẩm</th>
+									<th><abbr
+										title="Số lượng có sẵn = tín dụng - Hóa đơn trước + Trả nợ kỳ trước - Hóa đơn hiện tại + Trả nợ trong kỳ này - Số tiền đông lạnh cho giai đoạn hiện tại - Số tiền điều chỉnh">Số lượng có sẵn</abbr></th>
+								</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td colspan="9"><span class="empty-content">Không có dữ liệu cho hạn mức tín dụng của bạn trong hệ thống.</span></td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan="9">
+											<div style="float: right; margin-right: 4px;">
+												Bạn có thể sử dụng hạn mức tín dụng của mình để thanh toán $<input type="number" min="0" max="100"
+													class="small-bold-red number" id="credit" name="credit"
+													value="88" style="width: 100px; margin: 0 3px;">
+											</div>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</fieldset>
+					</div>
+					</div>
+				</div>
+
+				<!-- Đơn đặt hàng kỳ trước, sử dụng cuối cùng, điều khoản bán hàng -->
+				<div class="row" style="margin-bottom:20px;">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+						<div class="checkbox pull-right">
+							<label> <input type="checkbox" id="terms" name="terms" />
+								Tôi đã đọc và đồng ý với"<a target="_blank"
+								href="<?php echo $this->baseUrl . '/default/index/terms';?>">Điều khoản và Điều kiện Bán hàng của Chúng Tôi </a>
+							</label>
+						</div>
+
+					</div>
+				</div>
+				<div class="row">
+					<div
+						class="col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+						<button type="button" class="btn btn-lg btn-block btn-primary"
+							id="btn_submit_order"
+							onclick="if (true == beforePost()) order_confirm_form.submit();">Nộp đơn đặt hàng</button>
+					</div>
+				</div>
+			</form>
+
+		</div>
+					<!-- Thêm biểu mẫu chế độ địa chỉ giao hàng -->
+			<div class="modal fade" role="dialog" tabIndex="-1"
+				id="new_address_dialog" aria-labelledby="new_address_modal_label"
+				aria-hidden="true" data-backdrop="static">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="new_address_modal_label">Sử dụng địa chỉ giao hàng mới</h4>
+						</div>
+						<div class="modal-body" id="new_address_content_div"></div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">tắt</button>
+							<button type="button" class="btn btn-primary"
+								id="new_address_button">Lưu và sử dụng</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Thêm biểu mẫu chế độ dự án IRIS -->
+			<div class="modal fade" role="dialog" tabIndex="-1"
+				id="new_iris_project_dialog"
+				aria-labelledby="new_iris_project_modal_label" aria-hidden="true"
+				data-backdrop="static">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="new_iris_project_modal_label">Thêm dự án IRIS</h4>
+						</div>
+						<div class="modal-body" id="new_iris_project_content_div"></div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">tắt</button>
+							<button type="button" class="btn btn-primary"
+								id="new_iris_project_button">Lưu và sử dụng</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end -->
+
+	</div>
+</body>
+</html>

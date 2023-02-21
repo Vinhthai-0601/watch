@@ -1,0 +1,149 @@
+body{
+  background: black !important;
+}
+#logo{
+  font-family: 'Calligraffitti', cursive;
+  transition: font-size 300ms;
+}
+
+
+
+
+progress {
+    z-index: 5;
+    width: 100%;
+    height: 5px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    background-color: transparent;
+    color: #F16522;
+    vertical-align: top;
+    display: block;
+    position: fixed;
+    margin-top: 72px;
+    display: none;
+    opacity: 0;
+}
+
+a#logo:hover {
+    font-size: 25px;
+    text-decoration: none;
+}
+
+
+
+#demo .carousel-inner img {
+    width: 100%;
+    height: 106vh;
+    object-fit: cover;
+}
+
+.swiper-container {
+  width: 100%;
+  height: 100%;
+}
+
+a.text-fo1:hover {
+    text-decoration: none;
+    color: #9d9d9d;
+}
+
+ul.nav-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+li.text-fo {
+    max-width: 150px;
+    margin-right: 30px;
+    margin-bottom: 0;
+    text-align: center;
+    list-style: none;
+}
+
+.text{
+  color: white;
+}
+
+a.text:hover {
+    text-decoration: none;
+    color: #9d9d9d;
+}
+
+.swiper-wrapper {
+    display: none;
+    opacity: 0;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+}
+.swiper-slide img{
+  height: 100vh;
+}
+span.swiper-pagination-bullet {
+    background: white;
+}
+hr{
+  background-color: white;
+  width: 75%;
+}
+.pre a i {
+    font-size: 45px;
+}
+p {
+    font-weight: lighter;
+}
+
+.col-md-4 img {
+  filter: brightness(0.5);
+}
+
+.col-md-4 img:hover {
+    filter: none;
+}
+iframe{
+  border: none;
+}
+ .loadbox img{
+  width: 100%;
+}
+.loadbox {
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    height: 100vh;
+    background: #fff;
+    z-index: 0;
+    opacity: 1;
+    display: flex;
+}
+
+.navbar {
+    transition: all 0.4s;
+}
+
+.navbar .nav-link {
+    color: #fff;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    color: #fff;
+    text-decoration: none;
+}
+
+.navbar .navbar-brand {
+    color: #fff;
+}
+
+.navbar .navbar-brand-black {
+    color: black;
+    font-size: 20px
+}
